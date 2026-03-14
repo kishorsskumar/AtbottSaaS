@@ -98,10 +98,20 @@ Utility scripts package. Each script is a `.ts` file in `src/` with a correspond
 
 ### `backend/` — Atbott SaaS Project (Python FastAPI)
 
-FastAPI server for the Atbott SaaS Project. Provides a `/generate` endpoint that proxies requests to the Claude API.
+FastAPI server for the Atbott SaaS Project. Provides a `/generate` endpoint that proxies requests to the Claude API (claude-sonnet-4-20250514).
 
 - Entry: `backend/main.py`
 - Dependencies: fastapi, uvicorn, python-dotenv, requests
 - Run: `uvicorn backend.main:app --host 0.0.0.0 --port 8000`
 - API docs: `/docs` (Swagger UI)
 - Environment variables: `CLAUDE_API_KEY`, `SUPABASE_URL`, `SUPABASE_KEY`
+- Workflow: "Atbott Backend" (console, port 8000)
+
+### `frontend/` — Atbott SaaS Project Frontend (Vite + React)
+
+React frontend workspace UI for the Atbott SaaS Project. Provides a prompt textarea and output display that connects to the FastAPI backend.
+
+- Entry: `frontend/src/App.jsx`
+- Dependencies: react, axios, @monaco-editor/react
+- Vite proxy: `/generate` → `http://localhost:8000`
+- Served via artifact `atbott-saas` at `/`
