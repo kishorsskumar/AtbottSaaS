@@ -1,0 +1,107 @@
+Implement secure admin authentication for Atbott SaaS Project using Supabase Auth.
+
+─────────────────────────────
+1. In Supabase > Authentication tab:
+   • Enable Email + Password auth.
+   • Optionally also invite your admin account (email you’ll use for login).
+
+₂. In Supabase SQL Editor > run:
+---
+alter table auth.users add column if not exists is_admin boolean default false;
+update auth.users set is_admin = true where email ='<YOUR_ADMIN_EMAIL>';
+---
+
+─────────────────────────────
+3. Frontend Setup
+
+Install Supabase client:
+  npm install @supabase/supabase-js
+
+In frontend/src/supabaseClient.js:
+---
+import { createClient } from "@supabase/supabase-js";
+export const supabase = createClient(
+  import.meta.env.VITE_SUPABASE_URL,
+  import.meta.env.VITE_SUPABASE_ANON_KEY
+);
+---
+
+─────────────────────────────
+4. Modify Login.jsx for real Supabase Auth
+---
+import { useState } from "react";
+import { supabase } from "./supabaseClient";
+import "./styles/theme.css";
+
+export default function Login({ onLogin }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+
+  const signIn = async () => {
+    const { data, error : err } = await supabase.auth.signInWithPassword({
+      email, password
+    });
+    if (err) return setError(err.message);
+    onLogin(data.session.user);
+  };
+
+  return (
+    <div className="card" style={{width:400, margin:"10% auto", textAlign:"center"}}>
+      <img src="/logo_atbott.png" alt="logo" style={{height:60}}/>
+      <h3>Sign In to atBott Admin</h3>
+      <input type="email" placeholder="Email"
+        value={email} onChange={e=>setEmail(e.target.value)}
+        style={{width:"90%", marginBottom:10, padding:10}}/>
+      <input type="password" placeholder="Password"
+        value={password} onChange={e=>setPassword(e.target.value)}
+        style={{width:"90%", marginBottom:10, padding:10}}/>
+      <button className="btn-primary" onClick={signIn}>Sign In</button>
+      {error && <p style={{color:"red"}}>{error}</p>}
+    </div>
+  );
+}
+---
+
+─────────────────────────────
+5. Admin Check on Frontend Routing
+In src/main.jsx:
+---
+import { supabase } from "./supabaseClient";
+
+function RootApp() {
+  const [user, setUser] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(()=> {
+    supabase.auth.getUser().then(({ data:{ user } }) => {
+      setUser(user);
+      if (user?.user_metadata?.is_admin || user?.is_admin) setIsAdmin(true);
+    });
+  },[]);
+
+  if (!user) return <Login onLogin={setUser}/>;
+  if (!isAdmin) return <h2>Access restricted – Admins only.</h2>;
+  …
+}
+---
+
+─────────────────────────────
+6. Backend (optional): to guard critical routes like /ai_orchestrator etc.:
+
+In backend/main.py:
+---
+from fastapi import Request, HTTPException, Depends
+import supabase_py # or use API call
+
+async def require_admin(request:Request):
+  auth = request.headers.get("Authorization")
+  if not auth:
+    raise HTTPException(401,"Missing token")
+  # Optionally verify via Supabase JWT endpoint here
+---
+
+Attach `Depends(require_admin)` to sensitive routes.
+
+Display:
+✅ Admin Authentication Layer connected (Supabase Auth working).
