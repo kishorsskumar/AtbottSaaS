@@ -1,0 +1,14 @@
+{
+  "name": "Starter SaaS Base",
+  "description": "Essential file structure and modules for a new SaaS app.",
+  "backend": [
+    {"path": "backend/app.py", "content": "from fastapi import FastAPI\napp = FastAPI()"},
+    {"path": "backend/routes/home.py", "content": "from fastapi import APIRouter\nrouter = APIRouter()\n@router.get('/')\ndef home():\n    return {'message': 'Welcome Home'}"}
+  ],
+  "frontend": [
+    {"path": "frontend/src/pages/Home.jsx", "content": "export default function Home(){return <div>Welcome Home</div>}"}
+  ],
+  "database": [
+    {"table": "users", "fields": {"id": "serial primary key", "name": "text", "email": "text"}}
+  ]
+}

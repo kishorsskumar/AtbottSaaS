@@ -1,0 +1,101 @@
+Create a new folder called "blueprints" at the project root.
+
+1. Inside "blueprints", add an example JSON blueprint file "starter_saas.json" with:
+
+---
+{
+  "name": "Starter SaaS Base",
+  "description": "Essential file structure and modules for a new SaaS app.",
+  "backend": [
+    {"path": "backend/app.py", "content": "from fastapi import FastAPI\napp = FastAPI()"},
+    {"path": "backend/routes/home.py", "content": "from fastapi import APIRouter\nrouter = APIRouter()\n@router.get('/')\ndef home():\n    return {'message': 'Welcome Home'}"}
+  ],
+  "frontend": [
+    {"path": "frontend/src/pages/Home.jsx", "content": "export default function Home(){return <div>Welcome Home</div>}"}
+  ],
+  "database": [
+    {"table": "users", "fields": {"id": "serial primary key", "name": "text", "email": "text"}}
+  ]
+}
+---
+
+2. Create a new backend file "backend/ai_saas_builder.py" with:
+
+---
+import os, json
+from fastapi import APIRouter, Body
+from backend.ai_executor import execute_task
+
+router = APIRouter()
+
+@router.post("/build")
+def build_saas(idea: str = Body(..., embed=True)):
+    """
+    Orchestrate a new SaaS build based on blueprints and Claude reasoning.
+    """
+    # Phase 7 combines blueprint templates with Claude's intelligence
+    from backend.ai_agent import CLAUDE_API_KEY, CLAUDE_URL, ANTHROPIC_VERSION
+    import requests
+
+    # Load all blueprints
+    blueprints_dir = os.path.abspath("blueprints")
+    blueprint_files = [f for f in os.listdir(blueprints_dir) if f.endswith(".json")]
+
+    combined = []
+    for f in blueprint_files:
+        path = os.path.join(blueprints_dir, f)
+        with open(path, "r", encoding="utf-8") as file:
+            combined.append(json.load(file))
+
+    system = (
+        "You are an autonomous SaaS generator called Atbott Builder. "
+        "You have JSON blueprints describing modules and you can use them to scaffold full SaaS projects. "
+        "When I describe a business idea, choose the best blueprint modules, modify code paths if needed, "
+        "and respond with JSON write instructions for /ai_engine/write."
+    )
+
+    data = {
+        "model": "claude-3-5-sonnet-20240620",
+        "max_tokens": 800,
+        "messages": [
+            {"role": "system", "content": system},
+            {"role": "user", "content": f"Business Idea: {idea}\nBlueprints: {json.dumps(combined)}"}
+        ]
+    }
+
+    headers = {
+        "x-api-key": CLAUDE_API_KEY,
+        "content-type": "application/json",
+        "anthropic-version": ANTHROPIC_VERSION
+    }
+
+    resp = requests.post(CLAUDE_URL, headers=headers, json=data)
+    return resp.json()
+---
+
+3. In backend/main.py, include the new router:
+
+---
+from backend import ai_saas_builder
+app.include_router(ai_saas_builder.router, prefix="/ai_saas_builder", tags=["SaaS Auto Builder"])
+---
+
+4. Restart backend:
+   python backend/main.py
+
+5. Open /docs and find the new section:
+   ▶ SaaS Auto Builder → POST /ai_saas_builder/build
+
+6. Test it with a simple idea:
+---
+{
+  "idea": "Create a task manager SaaS with team dashboard and notifications."
+}
+---
+
+7. Claude's response will contain JSON write instructions or new module outlines.
+   We'll route these into the executor in Phase 8 to build full apps.
+---
+
+After confirming the endpoint appears, show the success message:
+"✅ Phase 7 SaaS Auto Builder ready."
