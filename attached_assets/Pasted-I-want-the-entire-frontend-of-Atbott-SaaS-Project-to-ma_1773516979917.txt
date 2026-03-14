@@ -1,0 +1,107 @@
+I want the entire frontend of Atbott SaaS Project to match this brand look:
+
+- White background, rounded white cards with soft shadows.
+- Accents in atBott blue: #16A0C6.
+- Sans‑serif typography (Montserrat, Open Sans, or similar).
+- The atBott logo and "Your Trusted Digital Partner" tagline at the top.
+- Maintain all editor / preview functions from earlier phases.
+
+Steps:
+
+1. In src/styles/theme.css add:
+---
+body {
+  margin:0;
+  font-family:"Open Sans", Arial, sans-serif;
+  background:#f6f9fc;
+  color:#111;
+}
+.card {
+  background:#fff;
+  border-radius:12px;
+  box-shadow:0 6px 15px rgba(0,0,0,0.08);
+  padding:2rem;
+}
+.btn-primary {
+  background:#16A0C6;
+  color:#fff;
+  border:none;
+  border-radius:6px;
+  padding:0.6rem 1.4rem;
+  font-weight:600;
+  cursor:pointer;
+}
+.btn-primary:hover { background:#1391b5; }
+---
+
+2. Create src/Login.jsx
+---
+import { useState } from "react";
+import "./styles/theme.css";
+
+export default function Login({ onLogin }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  return (
+    <div style={{
+      display:"flex", justifyContent:"center", alignItems:"center",
+      height:"100vh"
+    }}>
+      <div className="card" style={{width:500, display:"flex", flexDirection:"column", alignItems:"center"}}>
+        <img src="/logo_atbott.png" alt="atBott logo" style={{height:72, marginBottom:10}}/>
+        <h2 style={{margin:0}}>atBott</h2>
+        <p style={{marginTop:4, color:"#555"}}>Your Trusted Digital Partner</p>
+
+        <h3 style={{marginTop:30}}>Welcome Back</h3>
+        <input placeholder="Email" type="email"
+               value={email}
+               onChange={e=>setEmail(e.target.value)}
+               style={{width:"80%", marginTop:10, padding:"10px", borderRadius:6, border:"1px solid #ccc"}}/>
+        <input placeholder="Password" type="password"
+               value={password}
+               onChange={e=>setPassword(e.target.value)}
+               style={{width:"80%", marginTop:10, padding:"10px", borderRadius:6, border:"1px solid #ccc"}}/>
+        <button className="btn-primary" style={{marginTop:20, width:"84%"}} onClick={()=>onLogin(email)}>
+          Sign In
+        </button>
+
+        <p style={{marginTop:30, fontStyle:"italic", fontSize:13, color:"#777"}}>
+          "Excellence is not a skill – it's an attitude."
+        </p>
+      </div>
+    </div>
+  );
+}
+---
+
+3. In src/main.jsx, add a login gate before showing the workspace:
+---
+import React, { useState } from "react";
+import ReactDOM from "react-dom/client";
+import Login from "./Login";
+import Dashboard from "./Dashboard";
+import Workspace from "./Workspace";
+import "./styles/theme.css";
+
+function RootApp() {
+  const [user, setUser] = useState("");
+  const [project, setProject] = useState("");
+
+  if(!user) return <Login onLogin={setUser}/>;
+  if(!project) return <Dashboard onOpenProject={setProject}/>;
+  return <Workspace project={project} onExit={()=>setProject("")}/>;
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<RootApp/>);
+---
+
+4. Run:
+   cd frontend && npm run dev
+
+✅ This reproduces your original login UI branding
+(logo + tagline + blue primary buttons + quote),
+then transitions into your Replit‑style workspace once logged in.
+
+Display:
+"✅ Phase 10 Frontend UI – atBott branding layout applied."

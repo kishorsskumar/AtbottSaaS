@@ -1,0 +1,22 @@
+body {
+  margin: 0;
+  font-family: "Open Sans", Arial, sans-serif;
+  background: #f6f9fc;
+  color: #111;
+}
+.card {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 6px 15px rgba(0,0,0,0.08);
+  padding: 2rem;
+}
+.btn-primary {
+  background: #16A0C6;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.6rem 1.4rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn-primary:hover { background: #1391b5; }
