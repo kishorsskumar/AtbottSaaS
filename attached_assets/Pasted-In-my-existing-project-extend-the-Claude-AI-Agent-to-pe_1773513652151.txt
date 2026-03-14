@@ -1,0 +1,90 @@
+In my existing project, extend the Claude AI Agent to perform actual read/write actions automatically.
+
+1. Create a new file "backend/ai_executor.py" with the following code:
+
+---
+import os, json, requests
+from fastapi import APIRouter, Body
+from .ai_agent import CLAUDE_API_KEY, CLAUDE_URL, ANTHROPIC_VERSION
+
+router = APIRouter()
+BACKEND_URL = "[atbott-saas-project](https://atbott-saas-project)<YOUR_USERNAME>.repl.co/ai_engine"
+
+def read_file(path):
+    return requests.get(f"{BACKEND_URL}/read", params={"path": path}).json()["content"]
+
+def write_file(path, content):
+    requests.post(f"{BACKEND_URL}/write", json={"path": path, "content": content})
+
+@router.post("/execute")
+def execute_task(task: str = Body(..., embed=True)):
+    """
+    Send an autonomous modification task to Claude. Claude will read, edit and write files automatically.
+    """
+    headers = {
+        "x-api-key": CLAUDE_API_KEY,
+        "content-type": "application/json",
+        "anthropic-version": ANTHROPIC_VERSION
+    }
+
+    system_message = (
+        "You are an autonomous software engineer inside the Atbott SaaS Project environment. "
+        "Use only JSON responses with an 'action' field. "
+        "Example actions:\n"
+        "{'action':'read','path':'backend/main.py'} or "
+        "{'action':'write','path':'backend/newfile.py','content':'<code>'}. "
+        "You can chain multiple steps. Never run external commands."
+    )
+
+    data = {
+        "model": "claude-3-5-sonnet-20240620",
+        "max_tokens": 600,
+        "messages": [
+            {"role": "system", "content": system_message},
+            {"role": "user", "content": task}
+        ]
+    }
+
+    claude_response = requests.post(CLAUDE_URL, headers=headers, json=data).json()
+    text = claude_response.get("content", [{}])[0].get("text", "")
+
+    # Attempt to parse JSON snippet from Claude’s reply
+    try:
+        actions = json.loads(text)
+        if isinstance(actions, dict):
+            actions = [actions]
+    except Exception:
+        return {"error": "Claude returned non‑JSON response", "raw": text}
+
+    results = []
+    for act in actions:
+        typ = act.get("action")
+        if typ == "read":
+            content = read_file(act["path"])
+            results.append({"read": act["path"], "snippet": content[:500]})
+        elif typ == "write":
+            write_file(act["path"], act["content"])
+            results.append({"write": act["path"], "status": "done"})
+    return {"steps": results, "claude_reply": text}
+---
+
+2. In backend/main.py, mount the new executor router:
+---
+from backend import ai_executor
+app.include_router(ai_executor.router, prefix="/ai_executor", tags=["AI Executor"])
+---
+
+3. Restart the backend:
+   python backend/main.py
+
+4. Go to /docs → find **AI Executor → POST /ai_executor/execute** and run this test:
+---
+{
+  "task": "Create a new FastAPI route file backend/hello.py containing a route /hello that returns 'Hello from Atbott SaaS Project'."
+}
+---
+
+5. Check your Replit file tree — you should see backend/hello.py appear automatically.
+
+After confirmation, respond with message:
+"✅ Phase 6 Autonomous Claude Coding active."

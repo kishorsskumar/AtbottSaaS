@@ -3,10 +3,12 @@ from pydantic import BaseModel
 import os, requests
 from ai_engine import file_agent
 from backend import ai_agent
+from backend import ai_executor
 
 app = FastAPI(title="Atbott SaaS Project API")
 app.include_router(file_agent.router, prefix="/ai_engine", tags=["AI File Engine"])
 app.include_router(ai_agent.router, prefix="/ai_agent", tags=["Claude AI Agent"])
+app.include_router(ai_executor.router, prefix="/ai_executor", tags=["AI Executor"])
 
 class Prompt(BaseModel):
     message: str
