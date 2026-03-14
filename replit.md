@@ -2,7 +2,7 @@
 
 ## Overview
 
-pnpm workspace monorepo using TypeScript. Each package manages its own dependencies.
+pnpm workspace monorepo using TypeScript. Each package manages its own dependencies. Additionally includes the **Atbott SaaS Project** — a Python FastAPI backend.
 
 ## Stack
 
@@ -10,11 +10,12 @@ pnpm workspace monorepo using TypeScript. Each package manages its own dependenc
 - **Node.js version**: 24
 - **Package manager**: pnpm
 - **TypeScript version**: 5.9
-- **API framework**: Express 5
+- **API framework**: Express 5 (TS), FastAPI (Python)
 - **Database**: PostgreSQL + Drizzle ORM
 - **Validation**: Zod (`zod/v4`), `drizzle-zod`
 - **API codegen**: Orval (from OpenAPI spec)
 - **Build**: esbuild (CJS bundle)
+- **Python version**: 3.12
 
 ## Structure
 
@@ -94,3 +95,13 @@ Generated React Query hooks and fetch client from the OpenAPI spec (e.g. `useHea
 ### `scripts` (`@workspace/scripts`)
 
 Utility scripts package. Each script is a `.ts` file in `src/` with a corresponding npm script in `package.json`. Run scripts via `pnpm --filter @workspace/scripts run <script>`. Scripts can import any workspace package (e.g., `@workspace/db`) by adding it as a dependency in `scripts/package.json`.
+
+### `backend/` — Atbott SaaS Project (Python FastAPI)
+
+FastAPI server for the Atbott SaaS Project. Provides a `/generate` endpoint that proxies requests to the Claude API.
+
+- Entry: `backend/main.py`
+- Dependencies: fastapi, uvicorn, python-dotenv, requests
+- Run: `uvicorn backend.main:app --host 0.0.0.0 --port 8000`
+- API docs: `/docs` (Swagger UI)
+- Environment variables: `CLAUDE_API_KEY`, `SUPABASE_URL`, `SUPABASE_KEY`
