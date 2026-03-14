@@ -2,16 +2,16 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 import Editor from '@monaco-editor/react';
 
-export default function FileManager() {
+export default function FileManager({ basePath = '', onBack }) {
   const [files, setFiles] = useState([]);
   const [selectedFile, setSelectedFile] = useState('');
   const [content, setContent] = useState('');
   const [status, setStatus] = useState('');
-  const [currentPath, setCurrentPath] = useState('');
+  const [currentPath, setCurrentPath] = useState(basePath);
 
   useEffect(() => {
-    fetchFiles('');
-  }, []);
+    fetchFiles(basePath);
+  }, [basePath]);
 
   const fetchFiles = async (path) => {
     const res = await axios.get('/ai_engine/list', { params: { path } });
@@ -60,6 +60,11 @@ export default function FileManager() {
     <div style={{ display: 'flex', height: '100vh', background: '#1e1e1e', color: '#fff' }}>
       <div style={{ width: '25%', borderRight: '1px solid #333', overflowY: 'auto', padding: '10px' }}>
         <h3>Project Files</h3>
+        {onBack && (
+          <div onClick={onBack} style={{ cursor: 'pointer', padding: '4px 0', color: '#f88', marginBottom: 8 }}>
+            Back to Projects
+          </div>
+        )}
         {currentPath && (
           <div onClick={goUp} style={{ cursor: 'pointer', padding: '4px 0', color: '#88f' }}>
             .. (go up)

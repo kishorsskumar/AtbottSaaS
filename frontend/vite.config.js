@@ -13,6 +13,10 @@ export default defineConfig({
       '/ai_engine': {
         target: 'http://localhost:8000',
         changeOrigin: true
+      },
+      '/projects': {
+        target: 'http://localhost:8000',
+        changeOrigin: true
       }
     }
   }
