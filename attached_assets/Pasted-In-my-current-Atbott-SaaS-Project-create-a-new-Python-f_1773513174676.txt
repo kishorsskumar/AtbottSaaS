@@ -1,0 +1,72 @@
+In my current Atbott_SaaS_Project, create a new Python file "backend/ai_agent.py" with this full code:
+
+---
+import os, requests, json
+from fastapi import APIRouter, Body, HTTPException
+
+router = APIRouter()
+
+CLAUDE_API_KEY = os.getenv("CLAUDE_API_KEY")
+CLAUDE_URL = "[api.anthropic.com](https://api.anthropic.com/v1/messages)"
+ANTHROPIC_VERSION = "2023-06-01"
+
+BACKEND_URL = "[atbott-saas-project](https://atbott-saas-project)<YOUR_USERNAME>.repl.co/ai_engine"
+
+@router.post("/run")
+def run_ai_agent(task: str = Body(..., embed=True)):
+    """
+    Send a request to Claude to perform a development task that may involve file reading/writing.
+    """
+    headers = {
+        "x-api-key": CLAUDE_API_KEY,
+        "content-type": "application/json",
+        "anthropic-version": ANTHROPIC_VERSION
+    }
+
+    # SYSTEM PROMPT gives Claude permission and instructions
+    system_message = (
+        "You are an autonomous software engineer inside the Atbott SaaS Project environment. "
+        "You can read and write files via the provided HTTP API endpoints at /ai_engine."
+        "Use JSON commands like {action:'read', path:'...'} or {action:'write', path:'...', content:'...'} "
+        "to update files. Always keep valid Python/JS syntax when editing code."
+    )
+
+    data = {
+        "model": "claude-3-5-sonnet-20240620",
+        "max_tokens": 500,
+        "messages": [
+            {"role": "system", "content": system_message},
+            {"role": "user", "content": task}
+        ]
+    }
+
+    r = requests.post(CLAUDE_URL, headers=headers, json=data)
+    if r.status_code != 200:
+        raise HTTPException(status_code=r.status_code, detail=r.text)
+    return r.json()
+---
+
+2. In backend/main.py, mount the new agent router:
+
+---
+from backend import ai_agent
+app.include_router(ai_agent.router, prefix="/ai_agent", tags=["Claude AI Agent"])
+---
+
+3. Restart the backend:
+   python backend/main.py
+
+4. Open /docs again and verify you see a new route group:
+   ▶ Claude AI Agent
+      → POST /ai_agent/run
+
+5. Test it with this sample JSON prompt:
+   {
+     "task": "Read backend/main.py and suggest adding a FastAPI route /hello that returns 'Hello from Atbott SaaS Project'"
+   }
+
+6. Execute. The response should contain Claude’s reasoning and suggested code.
+   (We’ll wire full file‑editing automation in Phase 6.)
+
+Show the message:
+"✅ Phase 5 Claude Auto‑Editing Agent connected."
