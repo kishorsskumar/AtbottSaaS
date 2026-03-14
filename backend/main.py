@@ -7,12 +7,11 @@ app = FastAPI(title="Atbott SaaS Project API")
 class Prompt(BaseModel):
     message: str
 
-CLAUDE_API_KEY = os.getenv("CLAUDE_API_KEY")
-
 @app.post("/generate")
 def generate(prompt: Prompt):
+    api_key = os.getenv("CLAUDE_API_KEY")
     headers = {
-        "x-api-key": CLAUDE_API_KEY,
+        "x-api-key": api_key,
         "content-type": "application/json",
         "anthropic-version": "2023-06-01"
     }
