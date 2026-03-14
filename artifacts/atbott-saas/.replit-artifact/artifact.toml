@@ -1,0 +1,31 @@
+kind = "web"
+previewPath = "/"
+title = "Atbott SaaS Project"
+version = "1.0.0"
+id = "artifacts/atbott-saas"
+router = "path"
+
+[[integratedSkills]]
+name = "react-vite"
+version = "1.0.0"
+
+[[services]]
+localPort = 25074
+name = "web"
+paths = ["/"]
+
+[services.development]
+run = "pnpm --filter @workspace/atbott-saas run dev"
+
+[services.env]
+PORT = "25074"
+BASE_PATH = "/"
+
+[services.production]
+build = ["pnpm", "--filter", "@workspace/atbott-saas", "run", "build"]
+publicDir = "artifacts/atbott-saas/dist/public"
+serve = "static"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
