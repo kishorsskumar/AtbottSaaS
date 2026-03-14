@@ -1,0 +1,102 @@
+In my existing project (Atbott_SaaS_Project), integrate the Phase 3 file engine into the existing React frontend.
+
+Follow these steps:
+
+1. In the folder "frontend/src", create a new component "FileManager.jsx" with this code:
+
+---
+import { useEffect, useState } from 'react';
+import axios from 'axios';
+import Editor from '@monaco-editor/react';
+
+export default function FileManager() {
+  const [files, setFiles] = useState([]);
+  const [selectedFile, setSelectedFile] = useState('');
+  const [content, setContent] = useState('');
+  const [status, setStatus] = useState('');
+
+  const BASE_URL = '[atbott-saas-project](https://atbott-saas-project)<YOUR_USERNAME>.repl.co/ai_engine';
+
+  useEffect(() => {
+    fetchFiles('');
+  }, []);
+
+  const fetchFiles = async (path) => {
+    const res = await axios.get(`${BASE_URL}/list`, { params: { path } });
+    setFiles(res.data.items);
+  };
+
+  const openFile = async (filename) => {
+    setSelectedFile(filename);
+    const res = await axios.get(`${BASE_URL}/read`, { params: { path: filename } });
+    setContent(res.data.content);
+  };
+
+  const saveFile = async () => {
+    await axios.post(`${BASE_URL}/write`, {
+      path: selectedFile,
+      content
+    });
+    setStatus('Saved successfully ✅');
+    setTimeout(() => setStatus(''), 2000);
+  };
+
+  return (
+    <div style={{ display:'flex', height:'100vh', background:'#1e1e1e', color:'#fff' }}>
+      <div style={{ width:'25%', borderRight:'1px solid #333', overflowY:'auto', padding:'10px' }}>
+        <h3>Project Files</h3>
+        <ul style={{ listStyle:'none', padding:0 }}>
+          {files.map(f => (
+            <li key={f} onClick={() => openFile(f)} style={{ cursor:'pointer', padding:'4px 0' }}>
+              📄 {f}
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div style={{ flex:1, display:'flex', flexDirection:'column' }}>
+        <div style={{ padding:'10px', borderBottom:'1px solid #333' }}>
+          <strong>{selectedFile || 'No file selected'}</strong>
+          {selectedFile && <button onClick={saveFile} style={{ marginLeft:'10px' }}>💾 Save</button>}
+          <span style={{ marginLeft:'10px', color:'#0f0' }}>{status}</span>
+        </div>
+        <Editor
+          theme="vs-dark"
+          language="python"
+          value={content}
+          onChange={(val) => setContent(val)}
+          options={{ fontSize:14 }}
+          style={{ flex:1 }}
+        />
+      </div>
+    </div>
+  );
+}
+---
+
+2. In "frontend/src/main.jsx", replace <App /> with <FileManager /> to load the file manager after startup:
+
+---
+import React from 'react'
+import ReactDOM from 'react-dom/client'
+import FileManager from './FileManager'
+import './index.css'
+
+ReactDOM.createRoot(document.getElementById('root')).render(
+  <React.StrictMode>
+    <FileManager />
+  </React.StrictMode>,
+)
+---
+
+3. Replace <YOUR_USERNAME> in the BASE_URL with your actual Replit username.
+
+4. In the Replit shell:
+   cd frontend
+   npm run dev
+
+5. Open the frontend link in a new tab.
+   You’ll see all your project files listed on the left.
+   Clicking a file displays it in the Monaco editor, and the 💾 Save button updates it in Replit instantly.
+
+6. Confirm the message:
+   "✅ Phase 4 frontend integration working."
