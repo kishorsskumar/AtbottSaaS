@@ -1,0 +1,93 @@
+Enhance the frontend UI to include the atBott company logo and name prominently throughout the app.
+
+1. Place your logo file in frontend/public as:
+   /public/logo_atbott.png
+   (use your blue/white PNG from the shared design)
+
+2. Install Material UI (for layout and theme):
+   npm install @mui/material @mui/icons-material @emotion/react @emotion/styled react-split-pane
+
+3. Create a new file frontend/src/AppBarAtbott.jsx with:
+---
+import { AppBar, Toolbar, Typography } from "@mui/material";
+
+export default function AppBarAtbott({ project, onExit }) {
+  return (
+    <AppBar position="static" sx={{backgroundColor:"#000"}}>
+      <Toolbar sx={{display:"flex", alignItems:"center", gap:2}}>
+        <img src="/logo_atbott.png" alt="atBott Logo" style={{height:40}}/>
+        <Typography variant="h6" sx={{flexGrow:1, fontWeight:600}}>
+          {project ? project : "Atbott SaaS Workspace"}
+        </Typography>
+        <button style={{background:"#2196f3", color:"#fff", border:"none", padding:"6px 12px", borderRadius:4}}
+          onClick={onExit}>🏠 Dashboard</button>
+      </Toolbar>
+    </AppBar>
+  );
+}
+---
+
+4. Update frontend/src/Workspace.jsx to use it:
+
+---
+import SplitPane from "react-split-pane";
+import Box from "@mui/material/Box";
+import FileManager from "./FileManager";
+import LivePreview from "./LivePreview";
+import CollaboratorPanel from "./CollaboratorPanel";
+import AppBarAtbott from "./AppBarAtbott";
+
+export default function Workspace({ project, onExit }) {
+  return (
+    <Box sx={{height:"100vh", background:"#0d1117", color:"#fff", display:"flex", flexDirection:"column"}}>
+      <AppBarAtbott project={project} onExit={onExit}/>
+      <SplitPane split="vertical" minSize={240} defaultSize={260} style={{flex:1}}>
+        <div style={{background:"#1e1e1e", height:"100%"}}>
+          <FileManager/>
+        </div>
+        <SplitPane split="horizontal" defaultSize="70%">
+          <div style={{height:"100%", display:"flex", flexDirection:"column"}}>
+            <LivePreview url="[atbott-saas-project](https://atbott-saas-project)<YOUR_USERNAME>.repl.co"/>
+          </div>
+          <div style={{background:"#111", height:"100%"}}>
+            <CollaboratorPanel project={project}/>
+          </div>
+        </SplitPane>
+      </SplitPane>
+    </Box>
+  );
+}
+---
+
+5. Update frontend/src/Dashboard.jsx header to show your brand:
+
+---
+import { AppBar, Toolbar, Typography } from "@mui/material";
+
+export default function Dashboard({ onOpenProject }) {
+  return(
+    <div style={{height:"100vh", background:"#000", color:"#fff"}}>
+      <AppBar position="static" sx={{background:"#000"}}>
+        <Toolbar sx={{gap:2}}>
+          <img src="/logo_atbott.png" alt="Logo" style={{height:48}}/>
+          <Typography variant="h5" sx={{fontWeight:700}}>
+            Atbott SaaS Project Dashboard
+          </Typography>
+        </Toolbar>
+      </AppBar>
+      {/* rest of dashboard list content here */}
+    </div>
+  );
+}
+---
+
+6. Run:
+   cd frontend
+   npm run dev
+
+You will see:
+ - Black themed workspace with your blue atBott mark in AppBar and dashboard header.  
+ - Consistent branding across all pages and modules.  
+ - Everything else (editor, preview, chat) unchanged functionally.
+
+Log “✅ Phase 10 Frontend UI — atBott brand active.”

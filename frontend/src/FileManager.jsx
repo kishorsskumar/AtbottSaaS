@@ -3,7 +3,7 @@ import axios from 'axios';
 import Editor from '@monaco-editor/react';
 import LivePreview from './LivePreview';
 
-export default function FileManager({ basePath = '', onBack }) {
+export default function FileManager({ basePath = '' }) {
   const [files, setFiles] = useState([]);
   const [selectedFile, setSelectedFile] = useState('');
   const [content, setContent] = useState('');
@@ -91,17 +91,12 @@ export default function FileManager({ basePath = '', onBack }) {
   };
 
   return (
-    <div style={{ display: 'flex', height: '100vh', background: '#1e1e1e', color: '#fff' }}>
+    <div style={{ display: 'flex', height: '100%', background: '#1e1e1e', color: '#fff' }}>
       <div style={{ width: '25%', borderRight: '1px solid #333', overflowY: 'auto', padding: '10px' }}>
-        <h3>Project Files</h3>
-        <div style={{ fontSize: 12, marginBottom: 8, color: collabStatus === 'connected' ? '#0f0' : '#f88' }}>
+        <h3 style={{ margin: '0 0 8px 0' }}>Project Files</h3>
+        <div style={{ fontSize: 12, marginBottom: 8, color: collabStatus === 'connected' ? '#4caf50' : '#f88' }}>
           Collab: {collabStatus}
         </div>
-        {onBack && (
-          <div onClick={onBack} style={{ cursor: 'pointer', padding: '4px 0', color: '#f88', marginBottom: 8 }}>
-            Back to Projects
-          </div>
-        )}
         {currentPath && (
           <div onClick={goUp} style={{ cursor: 'pointer', padding: '4px 0', color: '#88f' }}>
             .. (go up)

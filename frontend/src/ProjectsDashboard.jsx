@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
+import { AppBar, Toolbar, Typography } from "@mui/material";
 
 export default function ProjectsDashboard({ onOpen }) {
   const [projects, setProjects] = useState([]);
@@ -23,33 +24,42 @@ export default function ProjectsDashboard({ onOpen }) {
   };
 
   return (
-    <div style={{padding:20, background:"#181818", color:"#fff", height:"100vh"}}>
-      <h2>Atbott SaaS Project Launcher</h2>
-      <div style={{marginBottom: 16}}>
-        <input
-          value={name}
-          onChange={e=>setName(e.target.value)}
-          placeholder="New project name"
-          style={{padding:"8px 12px", background:"#2a2a2a", color:"#fff", border:"1px solid #444", borderRadius:4, marginRight:8}}
-          onKeyDown={e => e.key === 'Enter' && create()}
-        />
-        <button onClick={create} style={{padding:"8px 16px", background:"#28a", color:"#fff", border:"none", borderRadius:4, cursor:"pointer"}}>
-          Create
-        </button>
+    <div style={{ height: "100vh", background: "#0d1117", color: "#fff" }}>
+      <AppBar position="static" sx={{ background: "#000" }}>
+        <Toolbar sx={{ gap: 2 }}>
+          <img src="/logo_atbott.png" alt="atBott Logo" style={{ height: 48 }} />
+          <Typography variant="h5" sx={{ fontWeight: 700 }}>
+            Atbott SaaS Project Dashboard
+          </Typography>
+        </Toolbar>
+      </AppBar>
+      <div style={{ padding: 24, maxWidth: 700, margin: "0 auto" }}>
+        <div style={{ marginBottom: 20, display: "flex", gap: 8 }}>
+          <input
+            value={name}
+            onChange={e => setName(e.target.value)}
+            placeholder="New project name"
+            style={{ padding: "10px 14px", background: "#161b22", color: "#fff", border: "1px solid #30363d", borderRadius: 6, flex: 1, fontSize: 14 }}
+            onKeyDown={e => e.key === 'Enter' && create()}
+          />
+          <button onClick={create} style={{ padding: "10px 20px", background: "#2196f3", color: "#fff", border: "none", borderRadius: 6, cursor: "pointer", fontWeight: 600, fontSize: 14 }}>
+            Create
+          </button>
+        </div>
+        <ul style={{ listStyle: "none", padding: 0 }}>
+          {projects.map(p => (
+            <li key={p} style={{ display: "flex", alignItems: "center", padding: "12px 16px", marginBottom: 8, background: "#161b22", borderRadius: 8, border: "1px solid #30363d" }}>
+              <span onClick={() => onOpen(p)} style={{ cursor: "pointer", flex: 1, color: "#58a6ff", fontSize: 15, fontWeight: 500 }}>
+                {p}
+              </span>
+              <button onClick={() => del(p)} style={{ background: "#da3633", color: "#fff", border: "none", borderRadius: 6, padding: "6px 14px", cursor: "pointer", fontSize: 13 }}>
+                Delete
+              </button>
+            </li>
+          ))}
+        </ul>
+        {projects.length === 0 && <p style={{ color: "#8b949e", textAlign: "center", marginTop: 40 }}>No projects yet. Create one above.</p>}
       </div>
-      <ul style={{listStyle:"none", padding:0}}>
-        {projects.map(p=>(
-          <li key={p} style={{display:"flex", alignItems:"center", padding:"8px 0", borderBottom:"1px solid #333"}}>
-            <span onClick={()=>onOpen(p)} style={{cursor:"pointer", flex:1, color:"#6cf"}}>
-              {p}
-            </span>
-            <button onClick={()=>del(p)} style={{background:"#a33", color:"#fff", border:"none", borderRadius:4, padding:"4px 10px", cursor:"pointer"}}>
-              Delete
-            </button>
-          </li>
-        ))}
-      </ul>
-      {projects.length === 0 && <p style={{color:"#888"}}>No projects yet. Create one above.</p>}
     </div>
   );
 }
