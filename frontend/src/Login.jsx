@@ -10,11 +10,9 @@ export default function Login({ onLogin }) {
       height: "100vh"
     }}>
       <div className="card" style={{ width: 500, display: "flex", flexDirection: "column", alignItems: "center" }}>
-        <img src="/logo_atbott.png" alt="atBott logo" style={{ height: 72, marginBottom: 10 }} />
-        <h2 style={{ margin: 0 }}>atBott</h2>
-        <p style={{ marginTop: 4, color: "#555" }}>Your Trusted Digital Partner</p>
+        <img src="/logo_atbott.png" alt="atBott logo" style={{ height: 80, marginBottom: 30 }} />
 
-        <h3 style={{ marginTop: 30 }}>Welcome Back</h3>
+        <h3 style={{ marginTop: 0 }}>Welcome Back</h3>
         <input placeholder="Email" type="email"
           value={email}
           onChange={e => setEmail(e.target.value)}
