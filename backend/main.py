@@ -1,8 +1,10 @@
 from fastapi import FastAPI
 from pydantic import BaseModel
 import os, requests
+from ai_engine import file_agent
 
 app = FastAPI(title="Atbott SaaS Project API")
+app.include_router(file_agent.router, prefix="/ai_engine", tags=["AI File Engine"])
 
 class Prompt(BaseModel):
     message: str
