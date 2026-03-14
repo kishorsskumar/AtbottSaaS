@@ -1,0 +1,86 @@
+We are now implementing Phase 10 for Atbott SaaS Project.
+
+1. Install a lightweight realtime backend:
+   pip install "fastapi[all]" python-socketio uvicorn
+
+2. In folder backend, create a file named collaboration.py with:
+
+---
+import os
+from fastapi import FastAPI
+from fastapi import WebSocket, WebSocketDisconnect
+from fastapi.routing import APIRouter
+from typing import List
+
+router = APIRouter()
+active_connections: List[WebSocket] = []
+
+@router.websocket("/collab/ws")
+async def collab_endpoint(ws: WebSocket):
+    await ws.accept()
+    active_connections.append(ws)
+    try:
+        while True:
+            data = await ws.receive_text()
+            # broadcast received edits to all other users
+            for conn in active_connections:
+                if conn is not ws:
+                    await conn.send_text(data)
+    except WebSocketDisconnect:
+        active_connections.remove(ws)
+---
+
+3. Update backend/main.py:
+---
+from backend import collaboration
+app.include_router(collaboration.router, prefix="", tags=["Team Collaboration"])
+---
+
+4. Restart your backend: 
+   python backend/main.py
+
+5. In frontend/src, create a new file LivePreview.jsx with:
+---
+import { useEffect, useRef } from 'react';
+export default function LivePreview({ url }) {
+  const frame = useRef();
+  useEffect(()=>{ frame.current.src = url },[url]);
+  return (
+    <div style={{flex:1, border:"1px solid #333", marginTop:10}}>
+      <iframe ref={frame} style={{width:"100%", height:"100%"}} title="Live Preview" />
+    </div>
+  )
+}
+---
+
+6. In FileManager.jsx (below your editor panel), add:
+---
+import io from "socket.io-client";
+import LivePreview from "./LivePreview";
+
+const socket = io("wss://atbott-saas-project.<YOUR_USERNAME>.repl.co", {
+  path:"/collab/ws"
+});
+useEffect(()=>{ 
+  socket.on("connect", ()=>console.log("Collab connected"));
+  socket.on("message", msg => {
+    // Replace this later with diff sync; for now, log
+    console.log("Edit event", msg);
+  });
+  return()=>socket.disconnect();
+},[]);
+---
+
+7. Run frontend:
+   cd frontend && npm run dev
+
+8. Open the app in two browser tabs.
+   Type in one file editor; watch console logs in the other
+   (broadcast confirmed = team realtime layer active).
+
+9. To preview generated SaaS apps, use:
+  <LivePreview url="[atbott-saas-project](https://atbott-saas-project)<YOUR_USERNAME>.repl.co" />
+  right below the editor in FileManager UI.
+
+10. Once everything loads and collaboration events are shown, display:
+"✅ Phase 10 complete – Realtime Collaboration and Live Preview enabled."
