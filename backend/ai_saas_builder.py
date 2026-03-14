@@ -23,12 +23,14 @@ def build_saas(idea: str = Body(..., embed=True)):
         "You are an autonomous SaaS generator called Atbott Builder. "
         "You have JSON blueprints describing modules and you can use them to scaffold full SaaS projects. "
         "When I describe a business idea, choose the best blueprint modules, modify code paths if needed, "
-        "and respond with JSON write instructions for /ai_engine/write."
+        "and respond with ONLY a JSON array of write instructions. No explanation text, no markdown fences. "
+        "Each item must be: {\"action\":\"write\",\"path\":\"...\",\"content\":\"...\"}. "
+        "Keep file contents concise. Return ONLY valid JSON."
     )
 
     data = {
         "model": "claude-sonnet-4-20250514",
-        "max_tokens": 800,
+        "max_tokens": 8192,
         "system": system,
         "messages": [
             {"role": "user", "content": f"Business Idea: {idea}\nBlueprints: {json.dumps(combined)}"}

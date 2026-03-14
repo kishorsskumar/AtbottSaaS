@@ -5,12 +5,14 @@ from ai_engine import file_agent
 from backend import ai_agent
 from backend import ai_executor
 from backend import ai_saas_builder
+from backend import ai_orchestrator
 
 app = FastAPI(title="Atbott SaaS Project API")
 app.include_router(file_agent.router, prefix="/ai_engine", tags=["AI File Engine"])
 app.include_router(ai_agent.router, prefix="/ai_agent", tags=["Claude AI Agent"])
 app.include_router(ai_executor.router, prefix="/ai_executor", tags=["AI Executor"])
 app.include_router(ai_saas_builder.router, prefix="/ai_saas_builder", tags=["SaaS Auto Builder"])
+app.include_router(ai_orchestrator.router, prefix="/ai_orchestrator", tags=["SaaS Deployment Orchestrator"])
 
 class Prompt(BaseModel):
     message: str
