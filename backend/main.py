@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.responses import RedirectResponse
 from pydantic import BaseModel
 import os, requests
 from ai_engine import file_agent
@@ -10,6 +11,11 @@ from backend.projects import manager as project_manager
 from backend import collaboration
 
 app = FastAPI(title="Atbott SaaS Project API")
+
+@app.get("/", include_in_schema=False)
+def root():
+    return RedirectResponse(url="/docs")
+
 app.include_router(file_agent.router, prefix="/ai_engine", tags=["AI File Engine"])
 app.include_router(ai_agent.router, prefix="/ai_agent", tags=["Claude AI Agent"])
 app.include_router(ai_executor.router, prefix="/ai_executor", tags=["AI Executor"])
