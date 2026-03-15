@@ -53,4 +53,4 @@ channel = "stable-25_05"
 
 [userenv.shared]
 SUPABASE_URL = "https://dulrasuupakmrpddqhci.supabase.co"
-SUPABASE_KEY = "sb_secret_LIO8HRYMFI-esVQytCUe8g_jo68sucE"
+SUPABASE_KEY = "sb_publishable_k0Jd02Ku9SSKhDXhwLF8Jw_Wm-LA3IH"
