@@ -1,0 +1,160 @@
+Please update my Atbott SaaS Project frontend so that it works exactly like Replit’s AI workspace.
+Make the following concrete updates:
+
+──────────────────────────────
+🧠 1. ADD PROMPT CONSOLE
+──────────────────────────────
+
+Create file : frontend/src/PromptConsole.jsx
+
+---
+import { useState } from "react";
+import axios from "axios";
+
+export default function PromptConsole({ onHtmlOutput }) {
+  const [prompt, setPrompt] = useState("");
+  const [output, setOutput] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const runPrompt = async () => {
+    if (!prompt.trim()) return;
+    setLoading(true);
+    try {
+      const res = await axios.post(
+        "[atbott-saas-project](https://atbott-saas-project)<YOUR_USERNAME>.repl.co/ai_agent/run",
+        { task: prompt }
+      );
+      const text = res.data.content?.[0]?.text || JSON.stringify(res.data);
+      setOutput(text);
+      // detect HTML chunk and pass to preview
+      const htmlMatch = text.match(/<html[\s\S]*<\/html>/i);
+      if (htmlMatch) onHtmlOutput(htmlMatch[0]);
+    } catch (e) {
+      setOutput("Error: " + e.message);
+    }
+    setLoading(false);
+  };
+
+  return (
+    <div style={{
+      background:"#111", color:"#fff",
+      borderTop:"1px solid #333", padding:10
+    }}>
+      <textarea
+        value={prompt}
+        onChange={e=>setPrompt(e.target.value)}
+        placeholder="Describe what to build (e.g., Create a login page with dark theme)…"
+        style={{width:"100%", height:80, background:"#222", color:"#fff", border:"1px solid #444", borderRadius:4, padding:10}}
+      />
+      <button
+        onClick={runPrompt}
+        style={{marginTop:8, background:"#16A0C6", color:"#fff", border:"none", borderRadius:4, padding:"6px 14px"}}
+      >
+        {loading?"Running Claude …":"Run Prompt"}
+      </button>
+      <pre style={{marginTop:12, whiteSpace:"pre-wrap", fontFamily:"monospace"}}>{output}</pre>
+    </div>
+  );
+}
+---
+
+
+──────────────────────────────
+🌐 2. LIVE PREVIEW (RENDER HTML DIRECTLY)
+──────────────────────────────
+
+Replace file frontend/src/LivePreview.jsx with:
+
+---
+import { useState, useEffect } from "react";
+
+export default function LivePreview({ html }) {
+  const [url, setUrl] = useState("");
+
+  useEffect(() => {
+    if (!html) return;
+    const blob = new Blob([html], { type: "text/html" });
+    const blobUrl = URL.createObjectURL(blob);
+    setUrl(blobUrl);
+    return () => URL.revokeObjectURL(blobUrl);
+  }, [html]);
+
+  if (!html) {
+    return <div style={{color:"#999", padding:10}}>Live Preview: waiting for HTML output…</div>;
+  }
+
+  return (
+    <iframe
+      src={url}
+      style={{width:"100%", height:"100%", border:"none", background:"#fff"}}
+      title="Live Preview"
+    />
+  );
+}
+---
+
+
+──────────────────────────────
+🖥️ 3. REPLIT‑STYLE LAYOUT (EDITOR + PROMPT + PREVIEW)
+──────────────────────────────
+
+Update frontend/src/Workspace.jsx to this:
+
+---
+import { useState } from "react";
+import SplitPane from "react-split-pane";
+import Box from "@mui/material/Box";
+import FileManager from "./FileManager";
+import AppBarAtbott from "./AppBarAtbott";
+import LivePreview from "./LivePreview";
+import PromptConsole from "./PromptConsole";
+import CollaboratorPanel from "./CollaboratorPanel";
+
+export default function Workspace({ project, onExit }) {
+  const [htmlOut, setHtmlOut] = useState("");
+
+  return (
+    <Box sx={{height:"100vh", background:"#0d1117", color:"#fff", display:"flex", flexDirection:"column"}}>
+      <AppBarAtbott project={project} onExit={onExit}/>
+      <SplitPane split="horizontal" defaultSize="80%" allowResize>
+        <SplitPane split="vertical" minSize={240} defaultSize={260}>
+          <div style={{background:"#1e1e1e", height:"100%"}}>
+            <FileManager/>
+          </div>
+          <div style={{display:"flex", flexDirection:"column", height:"100%"}}>
+            <div style={{flex:1}}>
+              <LivePreview html={htmlOut}/>
+            </div>
+            <CollaboratorPanel project={project}/>
+          </div>
+        </SplitPane>
+        <PromptConsole onHtmlOutput={setHtmlOut}/>
+      </SplitPane>
+    </Box>
+  );
+}
+---
+
+
+──────────────────────────────
+💅 4. RUN CHECK
+──────────────────────────────
+
+1. cd frontend
+2. npm run dev
+3. Open your workspace:
+  - Type a prompt like  
+    `Generate a simple HTML page that says Hello World in atBott style`
+  - Claude should reply instantly below and the iframe renders the page live.
+
+
+──────────────────────────────
+✅ Expected Result
+──────────────────────────────
+- Bottom prompt box sends task → Claude API  
+- Claude returns text and HTML → preview pane updates instantly  
+- UI matches Replit’s: file list (left) | editor/preview (right) | prompt console (bottom)
+- You can edit , generate, and preview any module on the fly.
+
+Display message when done:  
+"✅ Preview Panel and AI Prompt Console Working – Replit‑level UI Ready."

@@ -109,9 +109,16 @@ FastAPI server for the Atbott SaaS Project. Provides a `/generate` endpoint that
 
 ### `frontend/` — Atbott SaaS Project Frontend (Vite + React)
 
-React frontend workspace UI for the Atbott SaaS Project. Provides a prompt textarea and output display that connects to the FastAPI backend.
+React frontend workspace UI for the Atbott SaaS Project. Replit-style layout: file tree (left) + live preview (center) + AI prompt console (bottom).
 
-- Entry: `frontend/src/App.jsx`
-- Dependencies: react, axios, @monaco-editor/react
-- Vite proxy: `/generate` → `http://localhost:8000`
+- Entry: `frontend/src/main.jsx`
+- Key components:
+  - `Login.jsx` — Supabase auth login
+  - `ProjectsDashboard.jsx` — project CRUD
+  - `FileManager.jsx` — file tree + Monaco editor (sidebar)
+  - `PromptConsole.jsx` — sends prompts to Claude via `/ai_agent/run`, renders HTML output to live preview
+  - `LivePreview.jsx` — iframe blob preview of Claude-generated HTML
+  - `AppBarAtbott.jsx` — top app bar with branding
+- Dependencies: react, axios, @monaco-editor/react, @mui/material
+- Vite proxies: `/generate`, `/ai_engine`, `/projects`, `/ai_agent` → `http://localhost:8000`; `/collab/ws` → `ws://localhost:8000`
 - Served via artifact `atbott-saas` at `/`
