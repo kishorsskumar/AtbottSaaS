@@ -8,9 +8,6 @@ ANTHROPIC_VERSION = "2023-06-01"
 
 @router.post("/run")
 def run_ai_agent(task: str = Body(..., embed=True)):
-    """
-    Send a request to Claude to perform a development task that may involve file reading/writing.
-    """
     api_key = os.getenv("CLAUDE_API_KEY")
     headers = {
         "x-api-key": api_key,
@@ -19,15 +16,19 @@ def run_ai_agent(task: str = Body(..., embed=True)):
     }
 
     system_message = (
-        "You are an autonomous software engineer inside the Atbott SaaS Project environment. "
-        "You can read and write files via the provided HTTP API endpoints at /ai_engine. "
-        "Use JSON commands like {action:'read', path:'...'} or {action:'write', path:'...', content:'...'} "
-        "to update files. Always keep valid Python/JS syntax when editing code."
+        "You are an AI web developer inside the Atbott SaaS workspace. "
+        "When the user asks you to create or generate a page, component, or UI, "
+        "respond with a COMPLETE, self-contained HTML document wrapped in ```html code fences. "
+        "The HTML must start with <!DOCTYPE html> and include <html>, <head>, <body> tags. "
+        "Include all CSS inline in a <style> tag and all JS in a <script> tag. "
+        "Do NOT use external CDN links unless specifically asked. "
+        "Make the output visually polished with modern design. "
+        "If the user asks a non-HTML question, respond normally in plain text."
     )
 
     data = {
         "model": "claude-sonnet-4-20250514",
-        "max_tokens": 500,
+        "max_tokens": 8192,
         "system": system_message,
         "messages": [
             {"role": "user", "content": task}
