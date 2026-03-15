@@ -52,5 +52,5 @@ channel = "stable-25_05"
 [userenv]
 
 [userenv.shared]
-SUPABASE_URL = "your_supabase_url"
-SUPABASE_KEY = "your_supabase_key"
+SUPABASE_URL = "https://dulrasuupakmrpddqhci.supabase.co"
+SUPABASE_KEY = "sb_secret_LIO8HRYMFI-esVQytCUe8g_jo68sucE"
